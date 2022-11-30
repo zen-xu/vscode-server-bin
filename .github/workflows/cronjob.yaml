@@ -46,6 +46,8 @@ jobs:
       - name: New Unreleased VSCode Tag
         id: generate
         continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
         run: |
           poetry install
           poetry run python hack/tools.py update-server-bin ${{ matrix.vs_tag }}
@@ -53,7 +55,6 @@ jobs:
           version=$(echo ${{ matrix.vs_tag }} | tr ':' ' ' | awk '{print $1}')
           git config user.name 'ZhengYu, Xu'
           git config user.email 'zen-xu@outlook.com'
-          git remote set-url origin https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git add -u
           git commit -m "Bump version $version"
           git tag $version
