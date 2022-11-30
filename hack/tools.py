@@ -10,7 +10,7 @@ import typer
 import json
 
 VALID_VERSION_TAG_PATTERN = re.compile("^refs/tags/(\d+)\.(\d+)\.(\d+)$")
-MIN_VSCODE_SERVER_VERSION = (1, 50, 0)
+MIN_VSCODE_SERVER_VERSION = (1, 72, 0)
 
 
 @dataclass
