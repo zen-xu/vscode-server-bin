@@ -1,0 +1,12 @@
+[tool.poetry]
+name = "vscode-server-bin"
+version = "0.1.0"
+description = ""
+authors = ["ZhengYu, Xu <zen-xu@outlook.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
