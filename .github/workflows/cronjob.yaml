@@ -44,3 +44,8 @@ jobs:
           poetry install
           poetry run python hack/tools.py update-server-bin ${{ matrix.vs_tag }}
           cat vscode_server_bin/vscode-commit-id
+          version=$(echo ${{ matrix.vs_tag }} | tr ':' ' ' | awk '{print $1}')
+          echo $version
+          git add .
+          git commit -m "bump version $version"
+          git tag $version
