@@ -12,6 +12,7 @@ import json
 VALID_VERSION_TAG_PATTERN = re.compile("^refs/tags/(\d+)\.(\d+)\.(\d+)$")
 MIN_VSCODE_SERVER_VERSION = (1, 50, 0)
 
+
 @dataclass
 class Tag:
     version: Tuple[int, int, int]
@@ -45,7 +46,12 @@ def fetch_tags(git_url: str) -> list[Tag]:
 
 
 def fetch_vscode_server_tags() -> list[Tag]:
-    return list(filter(lambda tag: tag.version >= MIN_VSCODE_SERVER_VERSION ,fetch_tags("https://github.com/microsoft/vscode.git")))
+    return list(
+        filter(
+            lambda tag: tag.version >= MIN_VSCODE_SERVER_VERSION,
+            fetch_tags("https://github.com/microsoft/vscode.git"),
+        )
+    )
 
 
 def fetch_self_repo_tags() -> list[Tag]:
@@ -58,19 +64,22 @@ def filter_unreleased_vscode_server_tags() -> list[Tag]:
 
 app = typer.Typer()
 
+
 @app.command()
 def update_server_bin(tag_info: str):
     version, commit_id = tag_info.split(":")
-    rsp = requests.get(f"https://update.code.visualstudio.com/commit:{commit_id}/server-linux-x64/stable")
+    rsp = requests.get(
+        f"https://update.code.visualstudio.com/commit:{commit_id}/server-linux-x64/stable"
+    )
     rsp.raise_for_status()
-    module_root =Path(__file__).parent.parent
-    module_dir = module_root /  "vscode_server_bin"
+    module_root = Path(__file__).parent.parent
+    module_dir = module_root / "vscode_server_bin"
     (module_dir / "bin.tar.gz").write_bytes(rsp.content)
     (module_dir / "vscode-commit-id").write_text(commit_id)
     pyproject_toml = module_root / "pyproject.toml"
     with open(pyproject_toml, "rb") as f:
         config = tomli.load(f)
-    config["tool"]["poetry"]["version"] = ".".join(map(str, version))
+    config["tool"]["poetry"]["version"] = version
     with open(pyproject_toml, "wb") as f:
         tomli_w.dump(config, f)
 
@@ -78,7 +87,12 @@ def update_server_bin(tag_info: str):
 @app.command()
 def list_unreleased_tags():
     tags = filter_unreleased_vscode_server_tags()
-    print(json.dumps([f"{'.'.join(map(str, tag.version))}:{tag.commit_id}" for tag in tags]))
+    print(
+        json.dumps(
+            [f"{'.'.join(map(str, tag.version))}:{tag.commit_id}" for tag in tags]
+        )
+    )
+
 
 if __name__ == "__main__":
     app()
