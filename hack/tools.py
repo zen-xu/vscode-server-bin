@@ -6,6 +6,8 @@ from pathlib import Path
 import requests
 from dataclasses import dataclass
 import tomli, tomli_w
+import typer
+import json
 
 VALID_VERSION_TAG_PATTERN = re.compile("^refs/tags/(\d+)\.(\d+)\.(\d+)$")
 MIN_VSCODE_SERVER_VERSION = (1, 50, 0)
@@ -54,16 +56,29 @@ def filter_unreleased_vscode_server_tags() -> list[Tag]:
     return sorted(set(fetch_vscode_server_tags()) - set(fetch_self_repo_tags()))
 
 
-def update_server_bin(tag: Tag):
-    rsp = requests.get(f"https://update.code.visualstudio.com/commit:{tag.commit_id}/server-linux-x64/stable")
+app = typer.Typer()
+
+@app.command()
+def update_server_bin(tag_info: str):
+    version, commit_id = tag_info.split(":")
+    rsp = requests.get(f"https://update.code.visualstudio.com/commit:{commit_id}/server-linux-x64/stable")
     rsp.raise_for_status()
     module_root =Path(__file__).parent.parent
     module_dir = module_root /  "vscode_server_bin"
     (module_dir / "bin.tar.gz").write_bytes(rsp.content)
-    (module_dir / "vscode-commit-id").write_text(tag.commit_id)
+    (module_dir / "vscode-commit-id").write_text(commit_id)
     pyproject_toml = module_root / "pyproject.toml"
     with open(pyproject_toml, "rb") as f:
         config = tomli.load(f)
-    config["tool"]["poetry"]["version"] = ".".join(map(str, tag.version))
+    config["tool"]["poetry"]["version"] = ".".join(map(str, version))
     with open(pyproject_toml, "wb") as f:
         tomli_w.dump(config, f)
+
+
+@app.command()
+def list_unreleased_tags():
+    tags = filter_unreleased_vscode_server_tags()
+    print(json.dumps([f"{'.'.join(map(str, tag.version))}:{tag.commit_id}" for tag in tags]))
+
+if __name__ == "__main__":
+    app()
