@@ -51,3 +51,4 @@ jobs:
           git add vscode_server_bin/
           git commit -m "Bump version $version"
           git tag $version
+          git push --tags
