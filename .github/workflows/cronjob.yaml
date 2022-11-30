@@ -37,6 +37,8 @@ jobs:
         vs_tag: ${{ fromJSON(needs.list_unreleased.outputs.vs_tags) }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          ssh-key: "${{ secrets.COMMIT_KEY }}"
       - uses: actions/setup-python@v4
         with:
           python-version: "3.7"
@@ -46,15 +48,13 @@ jobs:
       - name: New Unreleased VSCode Tag
         id: generate
         continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
         run: |
           poetry install
           poetry run python hack/tools.py update-server-bin ${{ matrix.vs_tag }}
           cat vscode_server_bin/vscode-commit-id
           version=$(echo ${{ matrix.vs_tag }} | tr ':' ' ' | awk '{print $1}')
-          git config user.name 'ZhengYu, Xu'
-          git config user.email 'zen-xu@outlook.com'
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -u
           git commit -m "Bump version $version"
           git tag $version
