@@ -3,7 +3,7 @@ name: Release VSCode Server Bin
 on:
   push:
     tags:
-      - "*"
+      - "*.*.*"
 
 jobs:
   release:
