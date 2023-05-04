@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vscode-server-bin"
-version = "1.77.1"
+version = "1.78.0"
 description = ""
 authors = [
     "ZhengYu, Xu <zen-xu@outlook.com>",
