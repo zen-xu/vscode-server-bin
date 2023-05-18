@@ -19,7 +19,7 @@ jobs:
           python-version: "3.7"
       - uses: abatilo/actions-poetry@v2
         with:
-          poetry-version: "1.1.15"
+          poetry-version: "1.4.2"
       - name: Generate Unreleased VSCode Tags
         id: generate
         run: |
@@ -44,7 +44,7 @@ jobs:
           python-version: "3.7"
       - uses: abatilo/actions-poetry@v2
         with:
-          poetry-version: "1.1.15"
+          poetry-version: "1.4.2"
       - name: New Unreleased VSCode Tag
         id: generate
         continue-on-error: true
